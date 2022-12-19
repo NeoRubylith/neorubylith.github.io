@@ -1,9 +1,109 @@
-html {
-	--accent-1: #e46a8a;
-	--accent-2: #D95F69;
-	--grey: #555; 
-	--background: rgb(245, 245, 245);
+:root {
+	--light-a1: #e46a8a;
+	--light-a2: #D95F69;
+	--light-a3: #555;
+	--light-bg: #f5f5f5;
+	--light-switch-icon: "🌑";
+	--light-text: "Dark Mode";
+
+	--dark-a1: #e46a8a;
+	--dark-a2: #D95F69;
+	--dark-a3: #f5f5f5;
+	--dark-bg: #0a0a0a;
+	--dark-switch-icon: "☀️";
+	--dark-text: "Light Mode";
+
+	--accent-1: var(--light-a1);
+	--accent-2: var(--light-a2);
+	--accent-3: var(--light-a3);
+	--background: var(--light-bg);
+	--switch-icon: var(--light-switch-icon);
+	--switch-content: var(--light-text);
 }
+
+.theme-switch {
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+}
+
+.switch-label {
+	position: fixed;
+	padding: .5%;
+	bottom: 2px;
+	cursor: pointer;
+	display: flex;
+}
+
+.switch-label::before {
+	content: var(--switch-icon);
+	transition: text-shadow .2s;
+}
+
+.switch-label::after {
+	color: var(--switch-shadow-color);
+	content: var(--switch-content);
+	opacity: 0;
+	transition: opacity .2s;
+}
+
+.theme-switch:focus~#page .switch-label::before,
+.switch-label:hover::before {
+	text-shadow: 0 0 15px var(--switch-shadow-color);
+}
+
+.theme-switch:focus ~ #page .switch-label::after,
+.switch-label:hover::after {
+  opacity: 1;
+}
+
+.theme-switch:checked~#page {
+	--accent-1: var(--dark-a1);
+	--accent-2: var(--dark-a2);
+	--accent-3: var(--dark-a3);
+	--background: var(--dark-bg);
+	--switch-icon: var(--dark-switch-icon);
+	--switch-content: var(--dark-text);
+}
+
+#page {
+	background: var(--background);
+	color: var(--accent-3);
+	/* height: 100%; */
+	display: block;
+	overflow: auto;
+	transition: color .2s, background-color .2s;
+}
+
+#page div,
+p {
+	height: fit-content;
+	padding-top: 40px;
+	margin: 0px auto;
+	max-width: 75%;
+	line-height: 1.6;
+	font-size: 18px;
+}
+
+/* @media (prefers-color-scheme: dark) {
+	:root {
+		--accent-1: var(--dark-a1);
+		--accent-2: var(--dark-a2);
+		--accent-3: var(--dark-a3);
+		--background: var(--dark-bg);
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--accent-1: var(--light-a1);
+		--accent-2: var(--light-a2);
+		--accent-3: var(--light-a3);
+		--background: var(--light-bg);
+	}
+} */
 
 ::selection {
 	color: var(--background);
@@ -11,17 +111,17 @@ html {
 }
 
 body {
-	margin: 40px auto;
+	/* margin: 40px auto;
 	max-width: 75%;
 	line-height: 1.6;
-	font-size: 18px;
-	color: var(--grey);
-	/*Ode to the timer*/
-	background-color: var(--background);
-	padding: 0 10px
+	font-size: 18px; */
+	padding: 0;
+	margin: 0;
+	height: 100vh;
 }
 
 #masthead-title {
+	margin: 0;
 	margin-bottom: 5px;
 	display: flex;
 	align-items: center;
@@ -35,6 +135,7 @@ body {
 h1,
 h2,
 h3 {
+	margin: 40px;
 	line-height: 1.2;
 	height: 100%;
 }
@@ -47,6 +148,11 @@ hr {
 	border: 2px solid;
 	border-color: var(--accent-1);
 	overflow: hidden;
+}
+
+#header {
+	margin: 0;
+	height: fit-content;
 }
 
 #header>ul {
@@ -96,7 +202,7 @@ figure {
 	margin-left: 0%;
 }
 
-figure > img {
+figure>img {
 	margin-bottom: 0px;
 }
 
@@ -117,7 +223,7 @@ td {
 	border-collapse: collapse;
 	border: 1px solid;
 	padding-left: 5px;
-	padding-right: 5px; 
+	padding-right: 5px;
 }
 
 pre {
