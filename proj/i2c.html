@@ -1,0 +1,333 @@
+<!-- START1 -->
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-16">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Home</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+	<link href="/style.css" rel="stylesheet">
+</head>
+
+
+<input type="checkbox" class="theme-switch" id="theme-switch" />
+
+<body>
+	<div id="page">
+		<label for="theme-switch" class="switch-label"></label>
+		<div id="header">
+			<h1 id="masthead-title">
+				Aspen's Website
+				<img src="/media/cBlossom.gif">
+			</h1>
+			<ul>
+				<li>
+					<a href="/">Home</a>
+				</li>
+				<li>
+					<a href="/projects">Projects</a>
+				</li>
+				<li>
+					<a href="/resources">Resources</a>
+				</li>
+			</ul>
+			<hr>
+		</div>
+		<div id="content">
+			<!-- END1 -->
+			<h1 id="i2c-basics">I2C Basics:</h1>
+			<h2 id="note">Note:</h2>
+			<p>This guide is purposefully simple and does not address some of the
+				more intricate details of I2C (for now). For more information on I2C,
+				please refer to the following: <a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">NXP UM10204
+					I2C-bus specification and user manual</a>.</p>
+			<p>Another thing worth noting is that traditionally, electrical
+				engineers used “master/slave” to refer to I2C devices and these terms
+				are often found in reference materials. To avoid confusion when reading,
+				please note that this document is aligned with the latest I2C
+				specification (I2C v.7) which updated these terms to be
+				“controller/target”.</p>
+			<h2 id="what-is-i2c">What is I2C?</h2>
+			<ul>
+				<li>Originally created in 1982 by Philips (now NXP semiconductor) as a
+					simple 2-wire serial bus.</li>
+				<li>Uses only one data and one clock line to allow a single controller
+					to interface with multiple targets.</li>
+				<li>I2C is very popular because it requires a lower amount of gates to
+					implement compared to other similar protocols and only requires two
+					pins. Both of which reduce cost.</li>
+				<li>I2C is half duplex.</li>
+			</ul>
+			<h2 id="protocol-details">Protocol Details:</h2>
+			<ul>
+				<li>The controller initializes communication and provides the clock
+					signal (the SCL line is used to share the clock signal).</li>
+				<li>I2C supports Controller-Target communication. Only two devices may
+					use the bus at any given time.</li>
+				<li>The clock signal effectively sets the data transfer rate for the
+					system.
+					<ul>
+						<li>There is a maximum clock frequency for a given I2C mode but <em>no
+								minimum clock speed</em>.</li>
+					</ul>
+				</li>
+				<li>The data line (SDA) is bidirectional which means that the controller
+					can read <em>and</em> write to/from targets.</li>
+				<li>Since I2C is a serial bus, data is transmitted one bit at a time in
+					sync with the clock rate.</li>
+				<li>Multiple controllers may share a bus. (Note: the full I2C
+					specification covers arbitration and clock synchronization for this
+					case.)</li>
+				<li>Each device on the bus has a unique address, there are some reserved
+					addresses for certain features.
+					<ul>
+						<li>Without the use of multiplexers, every device on the bus
+							<em>must</em> have a unique address to prevent crowding.
+						</li>
+					</ul>
+				</li>
+				<li>The target can either be recieve only or act as an I2C
+					transceiver.</li>
+				<li>I2C hardware designs must account for capacitive loading on the bus
+					from parasitic capacitance of the signal lines and input capacitance of
+					devices on the bus.
+					<ul>
+						<li>It is recommended to not exceed 400pF of capacitive loading to keep
+							rise times in an acceptable range.</li>
+					</ul>
+				</li>
+			</ul>
+			<h2 id="i2c-communication-modes">I2C Communication Modes:</h2>
+			<table>
+				<thead>
+					<tr class="header">
+						<th>I2C Mode:</th>
+						<th>Speed (&lt;=)</th>
+						<th>Bus Direction</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="odd">
+						<td>Standard Mode (SM)</td>
+						<td>100 Kbps</td>
+						<td>Bidirectional</td>
+					</tr>
+					<tr class="even">
+						<td>Fast Mode (FM)</td>
+						<td>400 Kbps</td>
+						<td>Bidirectional</td>
+					</tr>
+					<tr class="odd">
+						<td>Fast Mode Plus (FM+)</td>
+						<td>1 Mbps</td>
+						<td>Bidirectional</td>
+					</tr>
+					<tr class="even">
+						<td>High Speed Mode (HS-Mode)</td>
+						<td>3.4 Mbps</td>
+						<td>Bidirectional</td>
+					</tr>
+					<tr class="odd">
+						<td>Ultra-Fast Mode (UFM)</td>
+						<td>5 Mbps</td>
+						<td>Unidirectional</td>
+					</tr>
+				</tbody>
+			</table>
+			<h2 id="circuit-description">Circuit Description:</h2>
+			<figure>
+				<img src="/media/i2c-bus-example.png" alt="Image of an I2C bus." />
+				<figcaption aria-hidden="true">Image of an I2C bus.</figcaption>
+			</figure>
+			<p>Pullup resistors pull SDA and SCL up to VDD. This is required for I2C
+				since the protocol is designed to have open drain (CMOS) or open
+				collector (BJT) devices on the bus. This way each device can easily pull
+				the line low with one transistor instead of using two in a push pull
+				configuration. Another benefit of this configuration is that the bus
+				cannot be crowded by two devices trying to pull a line to opposite logic
+				levels. This can result in indeterminate behavior and high currents
+				flowing from high to low potential (see diagram).</p>
+			<figure>
+				<img src="/media/open-drain.png" alt="Image of an open drain device pulling a line low." />
+				<figcaption aria-hidden="true">Image of an open drain device pulling a
+					line low.</figcaption>
+			</figure>
+			<figure>
+				<img src="/media/push-pull.png"
+					alt="Push-pull configuration with indeterminate behavior (bus gets pulled to vdd/2)." />
+				<figcaption aria-hidden="true">Push-pull configuration with
+					indeterminate behavior (bus gets pulled to vdd/2).</figcaption>
+			</figure>
+			<h2 id="basic-i2c-communication-frame-structure">Basic I2C Communication
+				Frame Structure:</h2>
+			<ul>
+				<li>The controller must wait until the bus is free.
+					<ul>
+						<li>SDA and SCL must both be high for the bus to be free.</li>
+					</ul>
+				</li>
+				<li>The controller then pulls the SDA line low while keeping SCL in the
+					default state (high, no clocking).
+					<ul>
+						<li>This is known as the start condition and triggers all other devices
+							on the bus to listen for their address to be called in the next
+							step.</li>
+					</ul>
+				</li>
+				<li>The controller starts providing the clock signal on SCL. All other
+					devices on the bus will use this signal as a reference for when logic
+					level changes on the SDA line are valid.
+					<ul>
+						<li>Apart from the start and stop conditions, no device on the bus may
+							change the state of SDA unless SCL is pulled low.</li>
+					</ul>
+				</li>
+				<li>The controller now sends a 7-bit address field.
+					<ul>
+						<li>10-bit addressing format:
+							<ul>
+								<li>10-bit addressing works by sending <code>0b1110XX</code> as the
+									7-bit address (where <code>XX</code> are the two MSBs of the 10-bit
+									address), a read/!write bit (see next list entry), an acknowledge bit
+									field to see if there are any 10-bit devices on the bus, finally
+									followed by the 8 remaining bits of the address and a second acknowledge
+									field for the device at the specified 10-bit address.</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li>The controller will then send the Read/!Write bit to signify whether
+					the next operation will be a read request or a write operation.
+					<ul>
+						<li>Read is active high, write is active low.</li>
+					</ul>
+				</li>
+				<li>At this stage, the device that was addressed earlier (the target) is
+					expected to acknowledge so the controller knows it’s on the bus and
+					ready to communicate.
+					<ul>
+						<li>To acknowledge, the target will pull SDA low. This is known as an
+							“ACK bit”.</li>
+						<li>If no device acknowledges the bus will continue to be pulled high by
+							the pullup resistors since the controller released the line. This is
+							known as an “NACK bit” (No Acknowledge).</li>
+						<li><strong><em>NOTE: All ACK/NACK signals must be sent by a
+									receiver.</em></strong></li>
+					</ul>
+				</li>
+				<li>If the receiver sent an ACK the data transfer process may follow.
+					<ul>
+						<li>Otherwise the operation is canceled.</li>
+					</ul>
+				</li>
+				<li>Data transfer is done in an unlimited sequence of 8-bit words.
+					<ul>
+						<li>After every 8-bit frame, the receiving device is expected to send an
+							ACK signal to ensure synchronization and that data is still making it to
+							the receiving device.</li>
+						<li>It is standard procedure for most devices to cancel data
+							transmission if an NACK is sent at this stage but the specification
+							allows for other scenarios. The datasheet of a device should be
+							consulted to determine its behavior since a NACK signal may also
+							represent other things (access delay, an interrupt is being serviced,
+							etc).</li>
+						<li>Some devices use a repeated start condition and will repeat the
+							control byte to signify continued data transfer.</li>
+					</ul>
+				</li>
+				<li>When the data transfer is finished, the controller transitions SDA
+					from low to high while holding SCL high. This is called the stop
+					condition and tells other devices that the bus is now free.</li>
+			</ul>
+			<p>In a system with multiple controllers, a controller may use a general
+				call to identify themselves to other devices on the bus (See <a href="#reserved-addresses">Reserved
+					Addresses</a> and section 3.1.13 of
+				the <a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">I2C
+					spec NXP UM10204</a>).</p>
+			<h2 id="anatomy-of-an-i2c-waveform">Anatomy of an I2C Waveform:</h2>
+			<p>Example I2C frame with two bytes of data transfer:</p>
+			<pre><code>             S
+             T                                                                                                           N   S
+             A                               R   A                                   A                                   A   T
+             R                               /   C                                   C                                   C   O
+     FREE    T       A5  A4  A3  A2  A1  A0  !W  K   D7  D6  D5  D4  D3  D2  D1  D0  K   D7  D6  D5  D4  D3  D2  D1  D0  K   P   FREE
+     ______      __  __  __  __  __  __  __  __      __  __  __  __  __  __  __  __      __  __  __  __  __  __  __  __  __      ____...
+SDA:       \    /  \/  \/  \/  \/  \/  \/  \/  \    /  \/  \/  \/  \/  \/  \/  \/  \    /  \/  \/  \/  \/  \/  \/  \/  \/  \    /
+            \__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/\__/    \__/
+
+                 X   X   X   X   X   X   X   X   0   X   X   X   X   X   X   X   X   0   X   X   X   X   X   X   X   X   1
+
+SCL: ──────────┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌───────...
+               └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘</code></pre>
+			<h2 id="reserved-addresses">Reserved-Addresses:</h2>
+			<p>I2C device addresses must not conflict with reserved addresses.</p>
+			<table>
+				<colgroup>
+					<col style="width: 20%" />
+					<col style="width: 12%" />
+					<col style="width: 66%" />
+				</colgroup>
+				<thead>
+					<tr class="header">
+						<th>Target address</th>
+						<th>R/!W bit</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="odd">
+						<td>0000 000</td>
+						<td>0</td>
+						<td>General call</td>
+					</tr>
+					<tr class="even">
+						<td>0000 000</td>
+						<td>1</td>
+						<td>START byte</td>
+					</tr>
+					<tr class="odd">
+						<td>0000 001</td>
+						<td>X</td>
+						<td>CBUS address</td>
+					</tr>
+					<tr class="even">
+						<td>0000 010</td>
+						<td>X</td>
+						<td>Reserved for different bus formats on a shared bus</td>
+					</tr>
+					<tr class="odd">
+						<td>0000 011</td>
+						<td>X</td>
+						<td>Reserved for future purposes</td>
+					</tr>
+					<tr class="even">
+						<td>0000 1XX</td>
+						<td>X</td>
+						<td>Hs-mode controller code</td>
+					</tr>
+					<tr class="odd">
+						<td>1111 1XX</td>
+						<td>1</td>
+						<td>Device ID</td>
+					</tr>
+					<tr class="even">
+						<td>1111 0XX</td>
+						<td>X</td>
+						<td>10-bit target addressing</td>
+					</tr>
+				</tbody>
+			</table>
+			<br>
+			<h2 id="end">End!</h2>
+			<p>There are still some concepts in I2C that still need to be covered
+				and will probably be added later. In the interim if you need more
+				details, the I2C specification is the most accurate source of
+				information.</p>
+
+		<!-- START2 -->
+	</div>
+</body>
+
+</html>
+<!-- END2 -->

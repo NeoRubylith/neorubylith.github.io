@@ -132,6 +132,7 @@ body {
 }
 
 #masthead-title img {
+	border-radius: 50%;
 	height: 1em;
 	padding-left: 0.125em;
 }
@@ -171,14 +172,13 @@ ul {
 	height: fit-content;
 	overflow: hidden;
 	white-space: nowrap;
-	/* padding: 0; */
 }
 
 figcaption {
 	line-height: 1;
 }
 
-li {
+#header li {
 	float: left;
 }
 
@@ -190,7 +190,6 @@ li {
 	padding-right: 10px;
 	padding-top: 0;
 	padding-bottom: 0;
-	/* color: var(--accent-1); */
 }
 
 a {
